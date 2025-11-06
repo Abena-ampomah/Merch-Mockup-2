@@ -7,7 +7,7 @@ interface ResultDisplayProps {
   isLoading: boolean;
   loadingMessage?: string;
   generatedImage?: string | null;
-  generatedVideo?: string | null;
+  generatedVideo?: string | null; // Keep for now as it's still conditionally used in render
   baseImage: string | undefined;
   title: string | undefined;
 }
@@ -77,14 +77,8 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ isLoading, generatedImage
   };
 
   const downloadMedia = async () => {
-    if (generatedVideo) {
-      const link = document.createElement('a');
-      link.href = generatedVideo;
-      link.download = `${title?.toLowerCase().replace(/\s+/g, '-') || 'result'}.mp4`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else if (generatedImage) {
+    // Only handle image download now that video generation is removed.
+    if (generatedImage) {
       try {
         const { dataUrl, mimeType, extension } = await processImageForDownload(generatedImage, selectedFormat, selectedSize);
         const link = document.createElement('a');
@@ -100,7 +94,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ isLoading, generatedImage
     }
   };
 
-  const hasMedia = generatedImage || generatedVideo;
+  const hasMedia = generatedImage; // No longer checking generatedVideo
   const isImageResult = !!generatedImage;
 
   return (
@@ -113,8 +107,6 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ isLoading, generatedImage
       )}
       {generatedImage ? (
         <img src={generatedImage} alt="Generated Result" className="w-full h-full object-contain" />
-      ) : generatedVideo ? (
-        <video src={generatedVideo} controls autoPlay loop className="w-full h-full object-contain" />
       ) : baseImage ? (
         <img src={baseImage} alt={title} className="w-full h-full object-cover opacity-50" />
       ) : (
@@ -123,6 +115,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ isLoading, generatedImage
 
       {hasMedia && !isLoading && (
         <div className="absolute bottom-4 right-4 flex flex-col items-end space-y-2">
+          {/* Only image options are displayed */}
           {isImageResult && (
             <>
               <select
