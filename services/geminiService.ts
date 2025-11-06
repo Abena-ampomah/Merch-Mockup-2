@@ -1,4 +1,6 @@
+
 import { GoogleGenAI, Modality } from "@google/genai";
+import type { AspectRatio } from "../types";
 
 const fileToGenerativePart = async (file: File) => {
   const base64EncodedDataPromise = new Promise<string>((resolve) => {
@@ -150,7 +152,7 @@ export const editImage = async (imageFile: File, prompt: string): Promise<string
     throw new Error("Image editing failed: No image was returned by the API.");
 };
 
-export const generateImage = async (prompt: string): Promise<string> => {
+export const generateImage = async (prompt: string, aspectRatio: AspectRatio): Promise<string> => {
     if (!process.env.API_KEY) {
         throw new Error("API_KEY environment variable not set.");
     }
@@ -162,7 +164,7 @@ export const generateImage = async (prompt: string): Promise<string> => {
         config: {
             numberOfImages: 1,
             outputMimeType: 'image/png',
-            aspectRatio: '1:1',
+            aspectRatio: aspectRatio,
         },
     });
 

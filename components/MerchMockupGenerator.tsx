@@ -9,11 +9,21 @@ import Spinner from './Spinner';
 import ModelSelector from './ModelSelector';
 import ColorSelector from './ColorSelector';
 
+const PREDEFINED_PROMPTS = [
+  "Place the logo on the center of the t-shirt, making it look like a high-quality print.",
+  "Place the logo on the left chest of the t-shirt, giving it a subtle, embroidered look.",
+  "Place the logo prominently on the front of the coffee mug, making it appear like a high-quality decal.",
+  "Integrate the logo subtly into the design of the tote bag, as if it's part of the fabric pattern.",
+  "Position the logo on the back of the hoodie, large and centered, with a distressed print effect.",
+  "Create a realistic vinyl sticker of the logo, placed on a clean surface.",
+  "Apply the logo as a full wrap design on a water bottle, with reflections consistent with the material.",
+];
+
 const MerchMockupGenerator: React.FC = () => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCTS[0]);
   const [selectedModel, setSelectedModel] = useState<Model | null>(null);
-  const [prompt, setPrompt] = useState<string>('Place the logo on the center of the t-shirt, making it look like a high-quality print.');
+  const [prompt, setPrompt] = useState<string>(PREDEFINED_PROMPTS[0]); // Default to first predefined prompt
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -144,6 +154,20 @@ const MerchMockupGenerator: React.FC = () => {
         
         <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
             <h2 className="text-xl font-bold text-cyan-400 mb-4">4. Describe Placement</h2>
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+              {PREDEFINED_PROMPTS.map((p, index) => (
+                <button
+                  key={index}
+                  onClick={() => setPrompt(p)}
+                  className={`py-2 px-3 rounded-lg text-xs font-medium text-left transition-colors ${
+                    prompt === p ? 'bg-cyan-600 text-white' : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                  }`}
+                  title={p}
+                >
+                  {p.length > 50 ? p.substring(0, 47) + '...' : p}
+                </button>
+              ))}
+            </div>
              <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
