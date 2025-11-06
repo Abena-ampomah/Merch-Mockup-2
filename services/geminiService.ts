@@ -171,3 +171,65 @@ export const generateImage = async (prompt: string, aspectRatio: AspectRatio): P
     const base64ImageBytes = response.generatedImages[0].image.imageBytes;
     return `data:image/png;base64,${base64ImageBytes}`;
 };
+
+export const generateVideo = async (
+    imageFile: File,
+    prompt: string,
+    aspectRatio: '16:9' | '9:16',
+    setLoadingMessage: (message: string) => void
+): Promise<string> => {
+    if (!process.env.API_KEY) {
+        throw new Error("API_KEY environment variable not set. Please select a key for Veo.");
+    }
+    // Create a new instance right before the API call to ensure the latest key is used.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+    const { data: base64EncodedData, mimeType } = (await fileToGenerativePart(imageFile)).inlineData;
+
+    setLoadingMessage("Starting video generation...");
+    let operation = await ai.models.generateVideos({
+        model: 'veo-3.1-fast-generate-preview',
+        prompt,
+        image: {
+            imageBytes: base64EncodedData,
+            mimeType: mimeType,
+        },
+        config: {
+            numberOfVideos: 1,
+            resolution: '720p',
+            aspectRatio: aspectRatio
+        }
+    });
+
+    let pollCount = 0;
+    const pollMessages = [
+        "Warming up the AI director...",
+        "Setting up the virtual cameras...",
+        "Rendering the first few frames...",
+        "Adding special effects...",
+        "Finalizing the scene...",
+        "Almost there, just polishing the final cut..."
+    ];
+
+    while (!operation.done) {
+        setLoadingMessage(pollMessages[pollCount % pollMessages.length] + ` (This can take a few minutes)`);
+        pollCount++;
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        operation = await ai.operations.getVideosOperation({ operation: operation });
+    }
+
+    setLoadingMessage("Fetching your video...");
+    const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
+    if (!downloadLink) {
+        throw new Error("Video generation completed, but no download link was found.");
+    }
+
+    const response = await fetch(`${downloadLink}&key=${process.env.API_KEY}`);
+    if (!response.ok) {
+        const errorBody = await response.text();
+        console.error("Video download failed:", errorBody);
+        throw new Error(`Failed to download video: ${response.statusText}`);
+    }
+    const videoBlob = await response.blob();
+    return URL.createObjectURL(videoBlob);
+};

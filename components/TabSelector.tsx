@@ -1,10 +1,9 @@
-
 import React from 'react';
 import type { Tool } from '../types';
 import { TshirtIcon } from './icons/TshirtIcon';
 import { PhotoIcon } from './icons/PhotoIcon';
 import { SparklesIcon } from './icons/SparklesIcon';
-
+import { VideoIcon } from './icons/VideoIcon';
 
 interface TabSelectorProps {
   activeTool: Tool;
@@ -15,6 +14,7 @@ const tools: { id: Tool; name: string; icon: React.FC<React.SVGProps<SVGSVGEleme
   { id: 'merch', name: 'Merch Mockups', icon: TshirtIcon },
   { id: 'image-editor', name: 'Image Editor', icon: PhotoIcon },
   { id: 'image-generator', name: 'Image Generator', icon: SparklesIcon },
+  { id: 'video-generator', name: 'Video Generator', icon: VideoIcon },
 ];
 
 const TabSelector: React.FC<TabSelectorProps> = ({ activeTool, onSelectTool }) => {

@@ -1,5 +1,5 @@
 
-export type Tool = 'merch' | 'image-editor' | 'image-generator';
+export type Tool = 'merch' | 'image-editor' | 'image-generator' | 'video-generator';
 
 export interface ProductColor {
   name: string;

@@ -4,6 +4,7 @@ import TabSelector from './components/TabSelector';
 import MerchMockupGenerator from './components/MerchMockupGenerator';
 import ImageEditor from './components/ImageEditor';
 import ImageGenerator from './components/ImageGenerator';
+import VideoGenerator from './components/VideoGenerator';
 import type { Tool } from './types';
 
 const App: React.FC = () => {
@@ -17,6 +18,8 @@ const App: React.FC = () => {
         return <ImageEditor />;
       case 'image-generator':
         return <ImageGenerator />;
+      case 'video-generator':
+        return <VideoGenerator />;
       default:
         return <MerchMockupGenerator />;
     }
