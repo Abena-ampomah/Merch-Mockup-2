@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { generateImage } from '../services/geminiService';
 import ResultDisplay from './ResultDisplay';

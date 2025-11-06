@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Spinner from './Spinner';
 import { DownloadIcon } from './icons/DownloadIcon';
@@ -7,7 +6,6 @@ interface ResultDisplayProps {
   isLoading: boolean;
   loadingMessage?: string;
   generatedImage?: string | null;
-  generatedVideo?: string | null;
   baseImage: string | undefined;
   title: string | undefined;
 }
@@ -25,7 +23,7 @@ const IMAGE_SIZE_OPTIONS = [
   { label: 'Small (max 800px)', value: 'small' },
 ];
 
-const ResultDisplay: React.FC<ResultDisplayProps> = ({ isLoading, generatedImage, generatedVideo, baseImage, title, loadingMessage }) => {
+const ResultDisplay: React.FC<ResultDisplayProps> = ({ isLoading, generatedImage, baseImage, title, loadingMessage }) => {
   const [selectedFormat, setSelectedFormat] = useState<'png' | 'jpeg' | 'webp'>('png');
   const [selectedSize, setSelectedSize] = useState<'original' | 'large' | 'medium' | 'small'>('original');
 
@@ -77,14 +75,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ isLoading, generatedImage
   };
 
   const downloadMedia = async () => {
-    if (generatedVideo) {
-      const link = document.createElement('a');
-      link.href = generatedVideo;
-      link.download = `${title?.toLowerCase().replace(/\s+/g, '-') || 'result'}.mp4`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else if (generatedImage) {
+    if (generatedImage) {
       try {
         const { dataUrl, mimeType, extension } = await processImageForDownload(generatedImage, selectedFormat, selectedSize);
         const link = document.createElement('a');
@@ -100,8 +91,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ isLoading, generatedImage
     }
   };
 
-  const hasMedia = generatedImage || generatedVideo;
-  const isImageResult = !!generatedImage;
+  const hasMedia = !!generatedImage;
 
   return (
     <div className="w-full aspect-square bg-gray-700 rounded-lg flex items-center justify-center relative overflow-hidden">
@@ -113,8 +103,6 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ isLoading, generatedImage
       )}
       {generatedImage ? (
         <img src={generatedImage} alt="Generated Result" className="w-full h-full object-contain" />
-      ) : generatedVideo ? (
-        <video src={generatedVideo} controls autoPlay loop className="w-full h-full object-contain" />
       ) : baseImage ? (
         <img src={baseImage} alt={title} className="w-full h-full object-cover opacity-50" />
       ) : (
@@ -123,34 +111,32 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ isLoading, generatedImage
 
       {hasMedia && !isLoading && (
         <div className="absolute bottom-4 right-4 flex flex-col items-end space-y-2">
-          {isImageResult && (
-            <>
-              <select
-                value={selectedFormat}
-                onChange={(e) => setSelectedFormat(e.target.value as typeof selectedFormat)}
-                className="bg-gray-700 text-white text-sm p-2 rounded-md focus:ring-cyan-500 focus:border-cyan-500 border border-gray-600 shadow-sm"
-                aria-label="Select download image format"
-              >
-                {IMAGE_FORMAT_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={selectedSize}
-                onChange={(e) => setSelectedSize(e.target.value as typeof selectedSize)}
-                className="bg-gray-700 text-white text-sm p-2 rounded-md focus:ring-cyan-500 focus:border-cyan-500 border border-gray-600 shadow-sm"
-                aria-label="Select download image size"
-              >
-                {IMAGE_SIZE_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </>
-          )}
+          <>
+            <select
+              value={selectedFormat}
+              onChange={(e) => setSelectedFormat(e.target.value as typeof selectedFormat)}
+              className="bg-gray-700 text-white text-sm p-2 rounded-md focus:ring-cyan-500 focus:border-cyan-500 border border-gray-600 shadow-sm"
+              aria-label="Select download image format"
+            >
+              {IMAGE_FORMAT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <select
+              value={selectedSize}
+              onChange={(e) => setSelectedSize(e.target.value as typeof selectedSize)}
+              className="bg-gray-700 text-white text-sm p-2 rounded-md focus:ring-cyan-500 focus:border-cyan-500 border border-gray-600 shadow-sm"
+              aria-label="Select download image size"
+            >
+              {IMAGE_SIZE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </>
           <button
             onClick={downloadMedia}
             className="bg-cyan-600 text-white p-3 rounded-full hover:bg-cyan-700 transition-colors shadow-lg"
